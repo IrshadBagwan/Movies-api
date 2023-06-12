@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import MoviesList from "./components/MoviesList";
 import "./App.css";
@@ -11,9 +11,10 @@ function App() {
   const [error, seterror] = useState(null);
   const [retrycount,setretrycount] = useState(0);
   const [cancel,setCancel] = useState(false);
- 
 
-  async function fetchMoviesHandler() {
+
+
+   const fetchMoviesHandler= useCallback(async ()=> {
     setisloading(true);
     seterror(null);
 
@@ -21,7 +22,7 @@ function App() {
     const retryInterval = 5000;
    
     try {
-      const response = await fetch("https://swapi.dev/api/film/");
+      const response = await fetch("https://swapi.dev/api/films/");
   
  
 
@@ -54,14 +55,17 @@ function App() {
     }
 
     setisloading(false);
-  }
+  },[]);
 
   const handleCancel = ()=>{
     setCancel(true);
   }
 
 
-
+  useEffect(()=>{
+    fetchMoviesHandler();
+  },[fetchMoviesHandler])
+ 
   
 
   return (
@@ -73,8 +77,9 @@ function App() {
         {!isloading && movies.length > 0 && <MoviesList movies={movies} />}
         {!isloading && movies.length === 0 && !error && <p>found not movies</p>}
         {!isloading && error && <p>{error}</p>}
-        <button onClick={handleCancel}>Cancel</button>
+        
         {isloading && <p>Loading....</p>}
+        <button onClick={handleCancel}>Cancel</button>
       </section>
     </React.Fragment>
   );
